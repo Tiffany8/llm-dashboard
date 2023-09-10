@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  db:
+    container_name: db
+    image: postgres:13
+    ports:
+      - 5432:5432
+    env_file:
+      - ./backend/.env
+
+  backend:
+    container_name: backend
+    build: ./backend
+    volumes:
+      - ./backend/app:/backend/app
+      - ./backend/alembic.ini:/backend/alembic.ini:ro
+      - ./backend/alembic:/backend/alembic
+    env_file:
+      - ./backend/.env
+    command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, 8000, --reload]
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
